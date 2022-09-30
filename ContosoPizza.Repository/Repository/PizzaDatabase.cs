@@ -1,6 +1,6 @@
 ﻿using ContosoPizza.Models;
 
-namespace ContosoPizza.Repository
+namespace ContosoPizza.Repository.Repository
 {
     public static class PizzaDatabase
     {

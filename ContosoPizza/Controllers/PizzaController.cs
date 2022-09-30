@@ -1,4 +1,5 @@
-﻿using ContosoPizza.Contracts;
+﻿using ContosoPizza.BusinessLogic.Contracts;
+using ContosoPizza.Contracts;
 using ContosoPizza.Models;
 using Microsoft.AspNetCore.Mvc;
 
@@ -10,10 +11,14 @@ public class PizzaController : ControllerBase
 {
     private readonly ILogger<PizzaController>? _logger;
     private readonly IPizzaService _pizzaService;
-    public PizzaController(ILogger<PizzaController> logger, IPizzaService pizzaService)
+    private readonly string _jsonPath;
+    public PizzaController(ILogger<PizzaController> logger, 
+        ICustomConfiguration customConfiguration,
+        IPizzaService pizzaService)
     {
         _pizzaService = pizzaService;
         _logger = logger;
+        _jsonPath = customConfiguration.GetJsonPath();
     }
 
     [HttpGet]
@@ -44,8 +49,15 @@ public class PizzaController : ControllerBase
     [HttpPost]
     public IActionResult Add(Pizza pizza)
     {
-        _pizzaService.Add(pizza);
-        return CreatedAtAction(nameof(Add), new { id = pizza.Id }, pizza);
+        var isSuccessful = _pizzaService.Add(pizza, _jsonPath);
+        if (isSuccessful)
+        {
+            return CreatedAtAction(nameof(Add), new { id = pizza.Id }, pizza);
+        }
+        else
+        {
+            return BadRequest();
+        }
     }
 
     [HttpPut("{id:int}")]
